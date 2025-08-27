@@ -1,0 +1,180 @@
+# golangci-lint configuration aligned with Effective Go guidelines
+# https://go.dev/doc/effective_go
+version: "2"
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+formatters:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/curtbushko/timber-git
+
+linters:
+  enable:
+    # Formatting and Style (Effective Go: Use gofmt, consistent style)
+    - whitespace     # Detects unnecessary whitespace
+    - wsl            # Enforces empty line rules
+    
+    # Naming Conventions (Effective Go: MixedCaps, interface naming)
+    - revive         # Extensible linter with naming rules
+    - varnamelen     # Checks variable name length matches scope
+    - predeclared    # Prevents shadowing predeclared identifiers
+    
+    # Error Handling (Effective Go: Always handle errors)
+    - errcheck       # Checks for unchecked errors
+    - errorlint      # Finds error wrapping issues (Go 1.13+)
+    - err113         # Checks error handling expressions
+    - wrapcheck      # Ensures external errors are wrapped
+    - nilerr         # Finds code returning nil error incorrectly
+    
+    # Code Quality and Complexity
+    - govet          # Standard Go vet checks
+    - staticcheck    # Comprehensive static analysis
+    - unused         # Finds unused constants, variables, functions
+    - ineffassign    # Detects ineffectual assignments
+    - unconvert      # Removes unnecessary type conversions
+    - unparam        # Reports unused function parameters
+    
+    # Security and Best Practices
+    - gosec          # Security-focused linter
+    - bodyclose      # Ensures HTTP response bodies are closed
+    - contextcheck   # Checks proper context usage
+    - noctx          # Finds HTTP requests without context
+    
+    # Performance
+    - prealloc       # Suggests slice preallocation
+    - makezero       # Finds slice declarations with non-zero length
+    - perfsprint     # Suggests faster alternatives to fmt.Sprintf
+    
+    # Documentation and Comments (Effective Go: Good comments)
+    - godot          # Checks if comments end in a period
+    - misspell       # Finds misspelled words in comments
+    - godox          # Detects TODO, FIXME comments
+    
+    # Code Structure
+    - gocyclo        # Checks cyclomatic complexity
+    - funlen         # Checks function length
+    - nestif         # Reports deeply nested if statements
+    - dupl           # Detects code duplication
+    - goconst        # Finds repeated strings for constants
+    
+    # Interface and Type Usage (Effective Go: Interface design)
+    - ireturn        # Accept interfaces, return concrete types
+    - interfacebloat # Checks interface method count
+
+  disable:
+    # Disable linters that are too strict for this codebase
+    - err113            # Static errors can be overly restrictive
+    - wsl               # Whitespace rules can be too strict
+    - funlen            # Function length limits can be restrictive
+    - godot             # Comment periods not always necessary
+    - godox             # TODO comments are acceptable during development
+    - gosec             # Security checks can have false positives
+    - gochecknoglobals  # Global variables sometimes necessary
+    - gochecknoinits    # Init functions have valid uses
+    - exhaustruct       # Not always practical to initialize all fields
+    - nonamedreturns    # Named returns are idiomatic in Go
+    - wrapcheck         # External error wrapping can be overly strict
+    - ireturn           # Interface returns not always practical
+
+linters-settings:
+  revive:
+    rules:
+      # Naming conventions aligned with Effective Go
+      - name: var-naming
+        arguments:
+          - ["ID", "URL", "HTTP", "JSON", "XML", "API", "UUID", "SQL", "TCP", "UDP", "IP"]
+          - ["VM"]
+      - name: exported
+      - name: dot-imports
+      - name: blank-imports
+      - name: if-return
+      - name: increment-decrement
+      - name: var-declaration
+      - name: range-val-in-closure
+      - name: range-val-address
+      - name: error-return
+      - name: error-naming
+      - name: error-strings
+      - name: receiver-naming
+      - name: indent-error-flow
+
+
+  errcheck:
+    check-type-assertions: true
+    check-blank: false
+    exclude-functions:
+      - io/ioutil.ReadFile
+      - io.Copy(*bytes.Buffer)
+      - io.Copy(os.Stdout)
+
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment  # Can conflict with readability
+
+  staticcheck:
+    checks: ["all"]
+
+
+
+  varnamelen:
+    min-name-length: 1
+    ignore-type-assert-ok: true
+    ignore-map-index-ok: true
+    ignore-chan-recv-ok: true
+    ignore-names:
+      - err
+      - ok
+      - id
+      - i
+      - j
+      - k
+      - v
+      - t
+
+  funlen:
+    lines: 80
+    statements: 40
+
+  gocyclo:
+    min-complexity: 15
+
+  nestif:
+    min-complexity: 4
+
+  godot:
+    scope: declarations
+    capital: true
+
+  misspell:
+    locale: US
+
+issues:
+  exclude-use-default: false
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+        - funlen
+
+    # Exclude known false positives
+    - text: "Use of weak random number generator"
+      linters:
+        - gosec
+
+    # Ignore complexity in main and init functions
+    - text: "cyclomatic complexity"
+      path: main\.go
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new-from-rev: ""
+  fix: false
