@@ -41,6 +41,37 @@ The environment is setup using nix. Everything uses make targets.
 - 'make build' will build a 'build-scheduler' binary bin directory
 - 'make run' will run the 'build-scheduler' from the bin directory
 
+# EXAMPLE OUTPUT
+
+```
+Starting dispatcher
+Worker started 3
+Worker started 2
+Worker started 4
+Submitting build to team queue 58a7fc09-3fda-4e15-ae12-11080e3c40ba
+Submitting build to team queue ccfe6657-6717-4bc0-afda-5ad7149c0090
+Submitting build to team queue 711458b4-59b2-40bb-ac5c-3e9b25ad2697
+Submitting build to team queue 97155754-5f28-4a92-98b0-9277608577dc
+Submitting build to team queue d00b5b0f-3bd5-4fc7-9794-766e2a86d1bc
+Worker started 1
+Running build 58a7fc09-3fda-4e15-ae12-11080e3c40ba
+Running build ccfe6657-6717-4bc0-afda-5ad7149c0090
+Build complete 58a7fc09-3fda-4e15-ae12-11080e3c40ba
+Build completed: ID=58a7fc09-3fda-4e15-ae12-11080e3c40ba, Status=complete, Team=1234, Duration=2562047h47m16.854775807s
+Running build 711458b4-59b2-40bb-ac5c-3e9b25ad2697
+Build complete ccfe6657-6717-4bc0-afda-5ad7149c0090
+Build completed: ID=ccfe6657-6717-4bc0-afda-5ad7149c0090, Status=complete, Team=1234, Duration=2562047h47m16.854775807s
+Running build 97155754-5f28-4a92-98b0-9277608577dc
+Build complete 711458b4-59b2-40bb-ac5c-3e9b25ad2697
+Build completed: ID=711458b4-59b2-40bb-ac5c-3e9b25ad2697, Status=complete, Team=1234, Duration=2562047h47m16.854775807s
+Running build d00b5b0f-3bd5-4fc7-9794-766e2a86d1bc
+Build complete 97155754-5f28-4a92-98b0-9277608577dc
+Build completed: ID=97155754-5f28-4a92-98b0-9277608577dc, Status=complete, Team=1234, Duration=2562047h47m16.854775807s
+Build complete d00b5b0f-3bd5-4fc7-9794-766e2a86d1bc
+Build completed: ID=d00b5b0f-3bd5-4fc7-9794-766e2a86d1bc, Status=complete, Team=1234, Duration=2562047h47m16.854775807s
+
+```
+
 # TODO
 - [x] Create a build type
     - should have: buildID, teamID, buildStart, buildEnd, queueStart, queueEnd, repo, branch, commit, status
