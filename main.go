@@ -21,11 +21,16 @@ func main() {
 	dispatcher := scheduler.NewDispatcher(workerCount, queueSize)
 	dispatcher.Start()
 
+	// Create team with hobby plan (2 concurrent builds)
+	team := scheduler.NewTeam("test-team", scheduler.HobbyPlan)
+	team.SetDispatcher(dispatcher)
+	team.Start()
+
 	go func() {
-		for i := 1; i <= 20; i++ {
-			build := scheduler.NewBuild(repo, branch, commit, teamID)
-			fmt.Println("Submitting build", build.ID)
-			dispatcher.SubmitBuild(*build)
+		for i := 1; i <= 5; i++ {
+			build := scheduler.NewBuild(repo, branch, commit, teamID, team.CompletionNotifs)
+			fmt.Println("Submitting build to team queue", build.ID)
+			team.SubmitBuild(*build)
 		}
 	}()
 
@@ -35,6 +40,7 @@ func main() {
 
 	<-sigChan // wait for interrupt
 	fmt.Println("Shutting down gracefully...")
+	team.Stop()
 	dispatcher.Stop()
 	fmt.Println("All workers stopped. Exiting.")
 }

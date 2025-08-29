@@ -6,9 +6,9 @@ import (
 )
 
 type Dispatcher struct {
-	WorkerCount int
 	BuildQueue  chan Build
 	workers     []*Worker
+	WorkerCount int
 	ctx         context.Context
 	cancel      context.CancelFunc
 	wg          *sync.WaitGroup
@@ -34,6 +34,14 @@ func (d *Dispatcher) Start() {
 }
 
 func (d *Dispatcher) SubmitBuild(build Build) {
+	d.wg.Add(1)
+	go func() {
+		d.BuildQueue <- build
+		d.wg.Done()
+	}()
+}
+
+func (d *Dispatcher) SubmitBuildFromTeam(build Build, team *Team) {
 	d.wg.Add(1)
 	go func() {
 		d.BuildQueue <- build

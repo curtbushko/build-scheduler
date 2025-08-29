@@ -8,33 +8,36 @@ import (
 )
 
 const (
-	buildStatusComplete = "complete"
-	buildStatusQueued   = "queued"
-	buildStatusStarted  = "started"
+	buildStatusComplete  = "complete"
+	buildStatusQueued    = "queued"
+	buildStatusDispatched = "dispatched"
+	buildStatusStarted   = "started"
 )
 
 type Build struct {
-	ID         string
-	Repo       string
-	Branch     string
-	Commit     string
-	Status     string
-	TeamID     string
-	QueueStart time.Time
-	BuildStart time.Time
-	BuildEnd   time.Time
+	ID              string
+	Repo            string
+	Branch          string
+	Commit          string
+	Status          string
+	TeamID          string
+	QueueStart      time.Time
+	BuildStart      time.Time
+	BuildEnd        time.Time
+	CompletionNotif chan<- string
 }
 
-func NewBuild(repo, branch, commit, teamID string) *Build {
+func NewBuild(repo, branch, commit, teamID string, completionChan chan<- string) *Build {
 	id := uuid.New()
 	return &Build{
-		ID:         id.String(),
-		Repo:       repo,
-		Branch:     branch,
-		Commit:     commit,
-		TeamID:     teamID,
-		QueueStart: time.Now(),
-		Status:     buildStatusQueued,
+		ID:              id.String(),
+		Repo:            repo,
+		Branch:          branch,
+		Commit:          commit,
+		TeamID:          teamID,
+		QueueStart:      time.Now(),
+		Status:          buildStatusQueued,
+		CompletionNotif: completionChan,
 	}
 }
 
@@ -46,5 +49,10 @@ func (b *Build) Process() error {
 	b.BuildEnd = time.Now()
 	b.Status = buildStatusComplete
 	fmt.Println("Build complete", b.ID)
+	
+	if b.CompletionNotif != nil {
+		b.CompletionNotif <- b.ID
+	}
+	
 	return nil
 }

@@ -1,10 +1,10 @@
-# build scheduler
+# BUILD SCHEDULER
 
 Basis for idea: [Build Queues on Vercel](https://vercel.com/docs/builds/build-queues)
 
-From the doc:
+From the website:
 
-# Concurrency queue
+## Concurrency queue
 This queue manages how many builds can run in parallel based on the number of concurrent build slots available to the team and user. If all concurrent build slots are in use, new builds are queued until a slot becomes available unless you have On-Demand Concurrent Builds enabled at the project level.
 
 ## How concurrent build slots work
@@ -17,7 +17,7 @@ Each account plan comes with a predefined number of build slots:
 - Pro accounts support up to 12 simultaneous builds.
 - Enterprise accounts can have custom limits based on their plan.
 
-# Git branch queue
+## Git branch queue
 
 When multiple builds are pushed to the same Git branch, they are handled sequentially. If new commits are pushed while a build is in progress:
 
@@ -27,19 +27,28 @@ When multiple builds are pushed to the same Git branch, they are handled sequent
 
 This ensures that only the latest changes are deployed, reducing unnecessary builds and improving deployment efficiency.
 
-# Concurrencty on the same branch
+## Concurrencty on the same branch
 
 It's possible for builds to be affected by both queues simultaneously. For example, if your builds are queued due to no slots being available and you submitted multiple commits to the same branch, the following will happen:
 
 - The latest commit to that branch will start building when a slot becomes available.
 - All previous commits to that branch will be skipped when that happens.
 
+# BUILDING AND RUNNING
+
+The environment is setup using nix. Everything uses make targets.
+
+- 'make build' will build a 'build-scheduler' binary bin directory
+- 'make run' will run the 'build-scheduler' from the bin directory
 
 # TODO
-- [ ] Create a build type
+- [x] Create a build type
     - should have: buildID, teamID, buildStart, buildEnd, queueStart, queueEnd, repo, branch, commit, status
-- [ ] Create a Team type
+- [x] Create a Team type
     - should have a []builds queue
     - teamID, totalQueueTime, totalBuildTime, plan, builds_active
+- [x] Create dispatcher
+- [x] Dispatch builds to workers based on slots
+- [ ] Add tests
 
 Worker Nodes can be self regulating and registering!
